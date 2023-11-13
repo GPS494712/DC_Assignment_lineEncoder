@@ -2,12 +2,19 @@
 #include <vector>
 #include "SDL2/SDL.h"
 
+
+#include "functions.c++"
+#include"input_reform.c++"
+
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const int scale = 40;
 
 SDL_Window *gWindow = nullptr;
 SDL_Renderer *gRenderer = nullptr;
+
+// TTF_Font* font;
+
 
 bool initSDL()
 {
@@ -25,6 +32,7 @@ bool initSDL()
         std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
     }
+ 
 
     // Create renderer
     gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -33,9 +41,6 @@ bool initSDL()
         std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
     }
-
-    // Set renderer draw color
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
 
     return true;
 }
@@ -53,11 +58,11 @@ void drawGrid()
     SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
 
     // Draw horizontal lines
-    for (int i = 0; i <= SCREEN_HEIGHT; i += scale)
-    {
-        SDL_RenderDrawLine(gRenderer, 0, i, 800, i);
-    }
-
+    // for (int i = 0; i <= SCREEN_HEIGHT; i += scale)
+    // {
+    //     SDL_RenderDrawLine(gRenderer, 0, i, 800, i);
+           SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
+    // }
     // Draw vertical lines
     for (int i = 0; i <= SCREEN_WIDTH; i += scale)
     {
@@ -65,193 +70,83 @@ void drawGrid()
     }
 }
 
-// draw square wave for this grid cartitian plane amplqitude 1
+const int INPUT_WIDTH = 200;
+const int INPUT_HEIGHT = 30;
+const int BUTTON_WIDTH = 100;
+const int BUTTON_HEIGHT = 40;
 
-void Nrz_l(int *test, int size)
-{
+std::string userInput = "";
+
+SDL_Rect inputRect = {(SCREEN_WIDTH - INPUT_WIDTH), 40, INPUT_WIDTH, INPUT_HEIGHT};
+SDL_Rect buttonRect = {(SCREEN_WIDTH - INPUT_WIDTH), 80, BUTTON_WIDTH, BUTTON_HEIGHT};
+
+void renderForm() {
+    // Render input field
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-    int xx = 0, yy = 260;
-    for (int i = 0; i < size - 1; i++)
-    {
-        // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
+    SDL_RenderDrawRect(gRenderer, &inputRect);
+    // SDL_RenderDrawLine(gRenderer, inputRect.x, inputRect.y + INPUT_HEIGHT, inputRect.x + INPUT_WIDTH, inputRect.y + INPUT_HEIGHT);
 
-        if (test[i] == 0)
-        {
-            SDL_RenderDrawLine(gRenderer, xx, 260, (xx) + scale, 260);
-            xx = xx + scale;
-        }
-        else
-        {
-            SDL_RenderDrawLine(gRenderer, (xx), 300, (xx + scale), 300);
-            xx = xx + scale;
-        }
+    // SDL_Surface* textSurface = TTF_RenderText_Solid(font, userInput.c_str(), textColor);
+    // SDL_Texture* textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+    // SDL_Rect textRect = {inputRect.x + 10, inputRect.y + 5, textSurface->w, textSurface->h};
+    // SDL_RenderCopy(gRenderer, textTexture, NULL, &textRect);
 
-        if (test[i + 1] != test[i])
-        {
-            SDL_RenderDrawLine(gRenderer, (xx), 260, (xx), 300);
-        }
-    }
+    // Render button
+    SDL_SetRenderDrawColor(gRenderer, 0, 0, 255, 255);
+    SDL_RenderFillRect(gRenderer, &buttonRect);
+    SDL_Surface* textSurface = SDL_CreateRGBSurfaceWithFormat(0, BUTTON_WIDTH, BUTTON_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
 
-    if (test[size - 1] == 1)
-    {
-        SDL_RenderDrawLine(gRenderer, (xx), 300, (xx + scale), 300);
-    }
-    else
-    {
-        SDL_RenderDrawLine(gRenderer, xx, 260, (xx) + scale, 260);
-    }
-}
+    // Render text inside the input field
+    for (size_t i = 0; i < userInput.size(); ++i) {
+        char c = userInput[i];
+        std::string charString(1, c);
+        // const char* charCStr = charString.c_str();
 
-void Nrz_i(int *test, int size)
-{
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-    int xx = 0, yy = 260;
-    bool change = false;
-    // std::vector<int>y(260,300);
-    int y;
-    for (int i = 0; i < size - 1; i++)
-    {
-        y = change ? 320 : 280;
-        // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-
-        SDL_RenderDrawLine(gRenderer, xx, y, (xx) + scale, y);
-        xx = xx + scale;
-
-        if (test[i + 1] == 1)
-        {
-            SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-            change = !change;
-        }
-    }
-    y = change ? 320 : 280;
-    if (test[size - 1] == 1)
-    {
-        SDL_RenderDrawLine(gRenderer, (xx), y, (xx + scale), y);
-    }
-    else
-    {
-        SDL_RenderDrawLine(gRenderer, xx, y, (xx) + scale, y);
-    }
-}
-
-void manchaster(int *test, int size)
-{
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-    int xx = 0, yy = 260;
-    for (int i = 0; i < size - 1; i++)
-    {
-        // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-        if (test[i] == 0)
-        {
-            SDL_RenderDrawLine(gRenderer, xx, 280, (xx) + (scale / 2), 280);
-            xx = xx + (scale / 2);
-            SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-            SDL_RenderDrawLine(gRenderer, (xx), 320, (xx + (scale / 2)), 320);
-            xx = xx + (scale / 2);
-        }
-        else
-        {
-            SDL_RenderDrawLine(gRenderer, (xx), 320, (xx + (scale / 2)), 320);
-            xx = xx + (scale / 2);
-            SDL_RenderDrawLine(gRenderer, (xx), 320, (xx), 280);
-            SDL_RenderDrawLine(gRenderer, (xx), 280, (xx + (scale / 2)), 280);
-            xx = xx + (scale / 2);
-        }
-
-        if (test[i + 1] == test[i])
-        {
-            SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-        }
-    }
-
-    if (test[size - 1] == 1)
-    {
-        SDL_RenderDrawLine(gRenderer, (xx), 320, (xx + (scale / 2)), 320);
-        xx = xx + (scale / 2);
-        SDL_RenderDrawLine(gRenderer, (xx), 320, (xx), 280);
-        SDL_RenderDrawLine(gRenderer, (xx), 280, (xx + (scale / 2)), 280);
-    }
-    else
-    {
-        SDL_RenderDrawLine(gRenderer, xx, 280, (xx) + (scale / 2), 280);
-        xx = xx + (scale / 2);
-        SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-        SDL_RenderDrawLine(gRenderer, (xx), 320, (xx + (scale / 2)), 320);
-    }
-}
-
-void d_manchester(int *test, int size)
-{
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-    int xx = 0, yy = 260;
-    bool change = false;
-    // std::vector<int>y(260,300);
-    int y;
-    for (int i = 0; i < size - 1; i++)
-    {
-        y = change ? 320 : 280;
-        // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-
-        SDL_RenderDrawLine(gRenderer, xx, y, (xx) + (scale/2), y);
-        xx = xx + (scale / 2);
-        SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-        if(y == 320) {y = 280;}
-        else {y = 320;}
-        SDL_RenderDrawLine(gRenderer, (xx), y, (xx + (scale / 2)), y);
-        xx = xx + (scale / 2);
-
-        if (test[i + 1] == 0)
-        {
-            SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-          
+        
+        SDL_Surface* charSurface = SDL_CreateRGBSurfaceWithFormat(0, 10, 20, 32, SDL_PIXELFORMAT_RGBA32);
+        if(c == 0){
+            SDL_FillRect(charSurface, NULL, SDL_MapRGBA(textSurface->format, 0, 255, 0, 255));
         }
         else{
-            change = !change;
+            SDL_FillRect(charSurface, NULL, SDL_MapRGBA(textSurface->format, 255, 0, 0, 255));
         }
+
+        SDL_Texture* charTexture = SDL_CreateTextureFromSurface(gRenderer, charSurface);
+
+        SDL_Rect charRect = {inputRect.x + 10 + i * 10, inputRect.y + 5, 10, 20};
+        SDL_RenderCopy(gRenderer, charTexture, NULL, &charRect);
+
+        SDL_FreeSurface(charSurface);
+        SDL_DestroyTexture(charTexture);
     }
-    y = change ? 320 : 280;
-    if (test[size - 1] == 1)
-    {
-        SDL_RenderDrawLine(gRenderer, (xx), y, (xx + scale), y);
-    }
-    else
-    {
-        SDL_RenderDrawLine(gRenderer, xx, y, (xx) + scale, y);
-    }
+
+    // Render text inside the button
+    const char* buttonText = "Submit";
+    SDL_FillRect(textSurface, NULL, SDL_MapRGBA(textSurface->format, 192, 192, 192, 255));
+
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+
+    SDL_Rect textRect = {buttonRect.x + 10, buttonRect.y + 5, BUTTON_WIDTH, BUTTON_HEIGHT};
+    SDL_RenderCopy(gRenderer, textTexture, NULL, &textRect);
+
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
 }
 
 
 int main(int argc, char *args[])
 {
-    int n;
-    std::cout << "Enter the number of Bits: ";
-    std::cin >> n;
-    std::cout << "Enter the Bits : ";
-    int arr[n];
-    for (int i = 0; i < n; i++)
-    {
-        std::cin >> arr[i];
-    }
+    // int n;
+    // std::cout << "Enter the number of Bits: ";
+    // std::cin >> n;
+    // std::cout << "Enter the Bits : ";
+    // int arr[n];
+
+    // Taking input from user
+    // for (int i = 0; i < n; i++)
+    // {
+    //     std::cin >> arr[i];
+    // }
 
     if (!initSDL())
     {
@@ -260,18 +155,46 @@ int main(int argc, char *args[])
     }
 
     bool quit = false;
-    SDL_Event e;
+    SDL_Event event;
     int xOffset = 0;
 
     while (!quit)
     {
         // Handle events
-        while (SDL_PollEvent(&e) != 0)
+        while (SDL_PollEvent(&event) != 0)
         {
-            if (e.type == SDL_QUIT)
-            {
+            // if (e.type == SDL_QUIT)
+            // {
+            //     quit = true;
+            // }
+            if (event.type == SDL_QUIT) {
                 quit = true;
+            } else if (event.type == SDL_TEXTINPUT) {
+                // Handle text input for the input field
+                userInput += event.text.text;
+            } else if (event.type == SDL_KEYDOWN) {
+                // Handle backspace for the input field
+                if (event.key.keysym.sym == SDLK_BACKSPACE && userInput.length() > 0) {
+                    userInput.pop_back();
+                }
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+
+                // Check if the mouse click is inside the button
+                if (mouseX >= buttonRect.x && mouseX <= buttonRect.x + BUTTON_WIDTH &&
+                    mouseY >= buttonRect.y && mouseY <= buttonRect.y + BUTTON_HEIGHT) {
+                    // Handle button click (you can add your logic here)
+                    std::cout << "Button clicked! User Input: " << userInput << std::endl;
+                    // userInput = "";  // Clear the input field after clicking the button
+                }
             }
+        }
+
+        int n = userInput.size();
+        int arr[n];
+        for(int i = 0; i < n; i++){
+            arr[i] = userInput[i] - 48;
         }
 
         // Clear the screen
@@ -280,11 +203,20 @@ int main(int argc, char *args[])
 
         // Draw the centered Cartesian plane grid
         drawGrid();
-        // Nrz_l(arr, n);
-        // Update the screen
-        // Nrz_i(arr, n);
-        // manchaster(arr, n);
-        d_manchester(arr, n);
+
+        // Select encoding techniques
+        // Nrz_l(arr, n, gRenderer, scale);
+        // Nrz_i(arr, n, gRenderer, scale);
+        // manchaster(arr, n, gRenderer, scale);
+        // d_manchester(arr, n, gRenderer, scale);
+        // AMI(arr, n, gRenderer, scale);
+        input_hdb3(arr,n);
+
+        scramble(arr, n, gRenderer, scale);
+        
+
+
+        renderForm();
 
         SDL_RenderPresent(gRenderer);
     }
