@@ -2,7 +2,7 @@
 #include <vector>
 #include "SDL2/SDL.h"
 
-void Nrz_l(int *test, int size, SDL_Renderer* gRenderer,int scale)
+void Nrz_l(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
@@ -42,7 +42,7 @@ void Nrz_l(int *test, int size, SDL_Renderer* gRenderer,int scale)
     }
 }
 
-void Nrz_i(int *test, int size, SDL_Renderer* gRenderer,int scale)
+void Nrz_i(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
@@ -79,7 +79,7 @@ void Nrz_i(int *test, int size, SDL_Renderer* gRenderer,int scale)
     }
 }
 
-void manchaster(int *test, int size, SDL_Renderer* gRenderer,int scale)
+void manchaster(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
@@ -130,7 +130,7 @@ void manchaster(int *test, int size, SDL_Renderer* gRenderer,int scale)
     }
 }
 
-void d_manchester(int *test, int size, SDL_Renderer* gRenderer,int scale)
+void d_manchester(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
@@ -147,20 +147,26 @@ void d_manchester(int *test, int size, SDL_Renderer* gRenderer,int scale)
         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
 
-        SDL_RenderDrawLine(gRenderer, xx, y, (xx) + (scale/2), y);
+        SDL_RenderDrawLine(gRenderer, xx, y, (xx) + (scale / 2), y);
         xx = xx + (scale / 2);
         SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-        if(y == 320) {y = 280;}
-        else {y = 320;}
+        if (y == 320)
+        {
+            y = 280;
+        }
+        else
+        {
+            y = 320;
+        }
         SDL_RenderDrawLine(gRenderer, (xx), y, (xx + (scale / 2)), y);
         xx = xx + (scale / 2);
 
         if (test[i + 1] == 0)
         {
             SDL_RenderDrawLine(gRenderer, (xx), 280, (xx), 320);
-          
         }
-        else{
+        else
+        {
             change = !change;
         }
     }
@@ -175,74 +181,21 @@ void d_manchester(int *test, int size, SDL_Renderer* gRenderer,int scale)
     }
 }
 
-// void AMI(int *test, int size, SDL_Renderer* gRenderer,int scale)
-// {
-//     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-//     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-//     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-//     bool change = false;
-//     int xx = 0, yy = 260;
-//     int y = change? 320 : 280;
-//     for (int i = 0; i < size - 1; i++)
-//     {
-//         // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-//         // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-//         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-//         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-//         int y = change? 320 : 280;
-
-
-//         if (test[i] == 0)
-//         {
-//             SDL_RenderDrawLine(gRenderer, xx, 300, (xx) + scale, 300);
-//             xx = xx + scale;
-//         }
-//         else
-//         {
-//             SDL_RenderDrawLine(gRenderer, (xx), y, (xx + scale), y);
-//             xx = xx + scale;
-//             change = !change;
-//         }
-
-//         if (test[i + 1] == 1)
-//         {
-//             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//         }
-
-//         if(test[i] == 1){
-//             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//         }
-//     }
-
-//     y = change? 320 : 280;
-
-//     if (test[size - 1] == 1)
-//     {
-//         SDL_RenderDrawLine(gRenderer, (xx), y, (xx + scale), y);
-//         xx = xx + scale;
-//         SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//     }
-//     else
-//     {
-//         SDL_RenderDrawLine(gRenderer, xx, 300, (xx) + scale, 300);
-//     }
-// }
-
-void AMI(int *test, int size, SDL_Renderer* gRenderer,int scale)
+void AMI(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
     bool change = false;
     int xx = 0, yy = 260;
-    int y = change? 320 : 280;
+    int y = change ? 320 : 280;
     for (int i = 0; i < size - 1; i++)
     {
         // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
         // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-        int y = change? 320 : 280;
+        int y = change ? 320 : 280;
 
         // if(test[i] == 2){
         // //    test[i] = 1;
@@ -260,27 +213,29 @@ void AMI(int *test, int size, SDL_Renderer* gRenderer,int scale)
             change = !change;
         }
 
-        if(test[i] == 1){
+        if (test[i] == 1)
+        {
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
-        if(test[i] == 2){
+        if (test[i] == 2)
+        {
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
 
         if (test[i + 1] == 1)
         {
-            y = change? 320 : 280;
+            y = change ? 320 : 280;
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
-        if(test[i + 1] == 2){
+        if (test[i + 1] == 2)
+        {
             change = !change;
-            y = change? 320 : 280;
+            y = change ? 320 : 280;
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
-
     }
 
-    y = change? 320 : 280;
+    y = change ? 320 : 280;
 
     if (test[size - 1] == 1)
     {
@@ -294,94 +249,22 @@ void AMI(int *test, int size, SDL_Renderer* gRenderer,int scale)
     }
 }
 
-
-
-// void scramble(int *test, int size, SDL_Renderer* gRenderer,int scale)
-// {
-//     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-//     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-//     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-//     bool change = false;
-//     int xx = 0, yy = 260;
-//     int y = change? 320 : 280;
-//     for (int i = 0; i < size - 1; i++)
-//     {
-//         // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-//         // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-//         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-//         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-//         int y = change? 320 : 280;
-
-//         // if(test[i] == 2){
-//         // //    test[i] = 1;
-//         // }
-
-//         if (test[i] == 0)
-//         {
-//             SDL_RenderDrawLine(gRenderer, xx, 300, (xx) + scale, 300);
-//             xx = xx + scale;
-//         }
-//         else
-//         {
-//             SDL_RenderDrawLine(gRenderer, (xx), y, (xx + scale), y);
-//             xx = xx + scale;
-//             change = !change;
-//         }
-
-//         if(test[i] == 1){
-//             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//         }
-//         if(test[i] == 2){
-//             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//         }
-
-//         if (test[i + 1] == 1)
-//         {
-//             y = change? 320 : 280;
-//             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//         }
-//         if(test[i + 1] == 2){
-//             change = !change;
-//             y = change? 320 : 280;
-//             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//         } 
-
-//     }
-
-//     y = change? 320 : 280;
-
-//     if (test[size - 1] == 1)
-//     {
-//         SDL_RenderDrawLine(gRenderer, (xx), y, (xx + scale), y);
-//         xx = xx + scale;
-//         SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
-//     }
-//     else if(test[size - 1] == 0)
-//     {
-//         SDL_RenderDrawLine(gRenderer, xx, 300, (xx) + scale, 300);
-//     }
-//     else{
-//         SDL_RenderDrawLine(gRenderer, xx, y, (xx) + scale, y);
-//     }
-// }
-
-
 // the above scramble-Encoding-signal logic is incorrect implement the correct logic here
-void scramble(int *test, int size, SDL_Renderer* gRenderer,int scale)
+void scramble(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
     bool change = false;
     int xx = 0, yy = 260;
-    int y = change? 320 : 280;
+    int y = change ? 320 : 280;
     for (int i = 0; i < size - 1; i++)
     {
         // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
         // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
         // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
-        int y = change? 320 : 280;
+        int y = change ? 320 : 280;
 
         // if(test[i] == 2){
         // //    test[i] = 1;
@@ -399,27 +282,29 @@ void scramble(int *test, int size, SDL_Renderer* gRenderer,int scale)
             change = !change;
         }
 
-        if(test[i] == 1){
+        if (test[i] == 1)
+        {
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
-        if(test[i] == 2){
+        if (test[i] == 2)
+        {
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
 
         if (test[i + 1] == 1)
         {
-            y = change? 320 : 280;
+            y = change ? 320 : 280;
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
-        if(test[i + 1] == 2){
+        if (test[i + 1] == 2)
+        {
             change = !change;
-            y = change? 320 : 280;
+            y = change ? 320 : 280;
             SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
         }
-
     }
 
-    y = change? 320 : 280;
+    y = change ? 320 : 280;
 
     if (test[size - 1] == 1)
     {
@@ -427,12 +312,12 @@ void scramble(int *test, int size, SDL_Renderer* gRenderer,int scale)
         xx = xx + scale;
         SDL_RenderDrawLine(gRenderer, (xx), 300, (xx), y);
     }
-    else if(test[size - 1] == 0)
+    else if (test[size - 1] == 0)
     {
         SDL_RenderDrawLine(gRenderer, xx, 300, (xx) + scale, 300);
     }
-    else{
+    else
+    {
         SDL_RenderDrawLine(gRenderer, xx, y, (xx) + scale, y);
     }
 }
-

@@ -1,232 +1,78 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
-
 #include "functions.c++"
+// #include "func_analog.c++"
 #include "input_reform.c++"
+#include "visuals.c++"
 
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 600;
-
-const int INPUT_WIDTH = 680;
-const int INPUT_HEIGHT = 30;
-const int BUTTON_WIDTH = 100;
-const int BUTTON_HEIGHT = 40;
-
-const int MENU_WIDTH = 200;
-const int MENU_HEIGHT = 40;
-const int MAIN_BOX_WIDTH = 200;
-const int MAIN_BOX_HEIGHT = 30;
-
-const char *selectedMenuItem = "NRZ-L";
-
-float scale = 160;
-bool isMenuVisible = false;
-
-SDL_Window *gWindow = nullptr;
-SDL_Renderer *gRenderer = nullptr;
-
-std::string userInput = "";
-
-TTF_Font *font;
-SDL_Color textColor = {0, 0, 255, 255};
-
-bool initSDL()
+enum SignalType
 {
-    // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    ANALOG,
+    DIGITAL
+};
+
+bool amplitudeInputActive = false;
+
+SignalType selectedSignal = ANALOG;
+
+void render_radio_button(SDL_Renderer *renderer, const char *text, int x, int y, bool selected)
+{
+    SDL_Rect outerRect = {x, y, 20, 20};
+    SDL_Rect innerRect = {x + 5, y + 5, 10, 10};
+
+    // Draw radio button outer circle
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderDrawRect(renderer, &outerRect);
+
+    // Draw radio button inner circle if selected
+    if (selected)
     {
-        std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
+        SDL_RenderFillRect(renderer, &innerRect);
     }
 
-    // Create window
-    gWindow = SDL_CreateWindow("Line Encoder", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (gWindow == nullptr)
-    {
-        std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
+    // Render radio button label
+    SDL_Color textColor = {0, 0, 0, 255};
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, textColor);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-    // Create renderer
-    gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-    if (gRenderer == nullptr)
-    {
-        std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
+    SDL_Rect destRect = {x + 30, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, nullptr, &destRect);
 
-    return true;
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
-void closeSDL()
+// In your main loop, call this function to render the radio buttons
+void render_radio_buttons(SDL_Renderer *renderer)
 {
-    SDL_DestroyRenderer(gRenderer);
-    SDL_DestroyWindow(gWindow);
-    SDL_Quit();
+    // Assuming TTF font is initialized and available globally
+
+    // Render Analog radio button
+    render_radio_button(renderer, "Analog", 10, 10, selectedSignal == ANALOG);
+
+    // Render Digital radio button
+    render_radio_button(renderer, "Digital", 10, 40, selectedSignal == DIGITAL);
 }
 
-void drawGrid()
+// In your main loop, handle mouse click events to update the selected signal
+void handle_mouse_click(SDL_Event &event)
 {
-    // Set draw color for the grid lines
-    SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
 
-    // Draw horizontal lines
-    // for (int i = 0; i <= SCREEN_HEIGHT; i += scale)
-    // {
-    //     SDL_RenderDrawLine(gRenderer, 0, i, 800, i);
-    SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-    // }
-    // Draw vertical lines
-    for (int i = 0; i <= 800; i += scale)
-    {
-        SDL_RenderDrawLine(gRenderer, i, 0, i, 600);
-    }
-}
-
-
-// Define menu items
-
-// Define menu items
-const char *menuItems[] = {"NRZ-L", "NRZ-I", "Manchester", "D-Manchester", "AMI", "HDB3", "B8ZS"};
-const int numMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
-
-SDL_Rect inputRect = {(100), 0, INPUT_WIDTH, INPUT_HEIGHT};
-SDL_Rect buttonRect = {100, 80, BUTTON_WIDTH, BUTTON_HEIGHT};
-
-void renderMenu()
-{
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    // SDL_Rect menuRect = {800, 200, MENU_WIDTH, MENU_HEIGHT};
-    // SDL_RenderFillRect(gRenderer, &menuRect);
-
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-    // SDL_RenderDrawRect(gRenderer, &menuRect);
-
-    if (isMenuVisible)
-    {
-        for (int i = 0; i < numMenuItems; i++)
-        {
-            SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
-            SDL_Rect itemRect = {800, 40 + i * MENU_HEIGHT, MENU_WIDTH, MENU_HEIGHT};
-            SDL_RenderFillRect(gRenderer, &itemRect);
-
-            // Render text for the item using SDL_ttf
-            SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItems[i], {0, 0, 0, 255});
-            SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-            SDL_Rect textRect = {800, 45 + i * MENU_HEIGHT, textSurface->w, textSurface->h};
-            SDL_RenderCopy(gRenderer, textTexture, nullptr, &textRect);
-            SDL_FreeSurface(textSurface);
-            SDL_DestroyTexture(textTexture);
-
-            if (selectedMenuItem == menuItems[i])
-            {
-                SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-            }
-        }
-    }
-}
-void renderComboBox()
-{
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    SDL_Rect boxRect = {800, 10, MAIN_BOX_WIDTH, MAIN_BOX_HEIGHT};
-    SDL_RenderFillRect(gRenderer, &boxRect);
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-    SDL_RenderDrawRect(gRenderer, &boxRect);
-
-    if (selectedMenuItem)
-    {
-        SDL_Surface *textSurface = TTF_RenderText_Solid(font, selectedMenuItem, {255, 255, 255, 255});
-        SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-        SDL_Rect textRect = {805, 16, textSurface->w, textSurface->h};
-        SDL_RenderCopy(gRenderer, textTexture, nullptr, &textRect);
-        SDL_FreeSurface(textSurface);
-        SDL_DestroyTexture(textTexture);
-    }
-}
-void renderForm()
-{
-    // Render input field
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    SDL_RenderDrawRect(gRenderer, &inputRect);
-    SDL_RenderDrawLine(gRenderer, inputRect.x, inputRect.y + INPUT_HEIGHT, inputRect.x + INPUT_WIDTH, inputRect.y + INPUT_HEIGHT);
-
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font, userInput.c_str(), textColor);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-
-    // Render text inside the input field
-    for (size_t i = 0; i < userInput.size(); ++i)
-    {
-        char c = userInput[i];
-        std::string charString(1, c);
-
-        // Render each character individually
-        SDL_Surface *charSurface = SDL_CreateRGBSurfaceWithFormat(0, 10, 20, 32, SDL_PIXELFORMAT_RGBA32);
-        SDL_FillRect(charSurface, NULL, 0); // Fill with transparent color
-
-        // Render text on the character surface
-        textSurface = TTF_RenderText_Solid(font, charString.c_str(), textColor);
-        SDL_Rect textRect = {0, 0, textSurface->w, textSurface->h};
-        SDL_BlitSurface(textSurface, NULL, charSurface, &textRect);
-
-        SDL_Texture *charTexture = SDL_CreateTextureFromSurface(gRenderer, charSurface);
-
-        SDL_Rect charRect = {inputRect.x + 10 + i * 10, inputRect.y + 5, 10, 20};
-        SDL_RenderCopy(gRenderer, charTexture, NULL, &charRect);
-
-        SDL_FreeSurface(charSurface);
-        SDL_FreeSurface(textSurface);
-        SDL_DestroyTexture(charTexture);
-    }
-
-    // Render button
-    SDL_SetRenderDrawColor(gRenderer, 0xC0, 0xC0, 0xC0, 0xFF);
-    SDL_RenderFillRect(gRenderer, &buttonRect);
-    SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderDrawRect(gRenderer, &buttonRect);
-
-    // Render text inside the button
-    const char *buttonText = "CLEAR";
-
-    // Render each character individually
-    for (size_t i = 0; i < strlen(buttonText); ++i)
-    {
-        char c = buttonText[i];
-        std::string charString(1, c);
-
-        SDL_Surface *charSurface = SDL_CreateRGBSurfaceWithFormat(0, 10, 20, 32, SDL_PIXELFORMAT_RGBA32);
-        SDL_FillRect(charSurface, NULL, 0); // Fill with transparent color
-
-        // Render text on the character surface
-        textSurface = TTF_RenderText_Solid(font, charString.c_str(), textColor);
-        SDL_Rect textRect = {0, 0, textSurface->w, textSurface->h};
-        SDL_BlitSurface(textSurface, NULL, charSurface, &textRect);
-
-        SDL_Texture *charTexture = SDL_CreateTextureFromSurface(gRenderer, charSurface);
-
-        SDL_Rect charRect = {buttonRect.x + 10 + i * 10, buttonRect.y + 5, 10, 20};
-        SDL_RenderCopy(gRenderer, charTexture, NULL, &charRect);
-
-        SDL_FreeSurface(charSurface);
-        SDL_FreeSurface(textSurface);
-        SDL_DestroyTexture(charTexture);
-    }
+    std::cout << selectedSignal << std::endl;
 }
 
 int main(int argc, char *args[])
 {
-    // int n;
-    // std::cout << "Enter the number of Bits: ";
-    // std::cin >> n;
-    // std::cout << "Enter the Bits : ";
-    // int arr[n];
-
-    // Taking input from user
-    // for (int i = 0; i < n; i++)
-    // {
-    //     std::cin >> arr[i];
-    // }
+    std ::unordered_map<int, std ::string> map;
+    map[-40] = "00";
+    map[-20] = "01";
+    map[20] = "11";
+    map[40] = "10";
 
     if (!initSDL())
     {
@@ -252,14 +98,16 @@ int main(int argc, char *args[])
         std::cerr << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
         return 1;
     }
-    int def = 0;
-
+    int def_a = 0;
+    int def_d = 0;
+    std::string input_a2d = SamplingWave(map);
     while (!quit)
     {
         int n = userInput.size();
         int arr[n];
         // std::cout << n << std::endl;
         // Handle events
+
         while (SDL_PollEvent(&event) != 0)
         {
             // if (e.type == SDL_QUIT)
@@ -273,7 +121,18 @@ int main(int argc, char *args[])
             else if (event.type == SDL_TEXTINPUT)
             {
                 // Handle text input for the input field
-                userInput += event.text.text;
+                if (selectedSignal == ANALOG)
+                {
+                    std::string &activeField = amplitudeInputActive ? userAmpInput : userFreqInput;
+                    if (activeField.length() < 4 && event.text.text[0] >= '0' && event.text.text[0] <= '9')
+                    {
+                        activeField += event.text.text;
+                    }
+                }
+                else
+                {
+                    userInput += event.text.text;
+                }
             }
             else if (event.type == SDL_KEYDOWN)
             {
@@ -282,12 +141,70 @@ int main(int argc, char *args[])
                 {
                     userInput.pop_back();
                 }
+                else if(event.key.keysym.sym == SDLK_PLUS || event.key.keysym.sym == SDLK_KP_PLUS){
+                    if (selectedSignal == ANALOG)
+                    {
+
+                        std::string &activeField = amplitudeInputActive ? userAmpInput : userFreqInput;
+                        int test = stoi(activeField);
+                        test++;
+                        activeField = std::to_string(test);
+                    }
+                }
+                else if(event.key.keysym.sym == SDLK_MINUS || event.key.keysym.sym == SDLK_KP_MINUS){
+                    if (selectedSignal == ANALOG)
+                    {
+
+                        std::string &activeField = amplitudeInputActive ? userAmpInput : userFreqInput;
+                        int test = stoi(activeField);
+                        test--;
+                        activeField = std::to_string(test);
+                    }
+                }
+                
+                // else if (selectedSignal == ANALOG)
+                // {
+
+                //     std::string &activeField = amplitudeInputActive ? userAmpInput : userFreqInput;
+                //     if(event.key.keysym.sym == SDLK_PLUS){
+                //         int test = stoi(activeField);
+                //         test++;
+                //         activeField = std::to_string(test);
+                //     }
+                //     else if(event.key.keysym.sym == SDLK_MINUS){
+                //         int test = stoi(activeField);
+                //         test--;
+                //         activeField = std::to_string(test);
+                //     }
+                    
+                // }
             }
             else if (event.type == SDL_MOUSEBUTTONDOWN)
             {
+
                 int mouseX, mouseY;
                 SDL_GetMouseState(&mouseX, &mouseY);
 
+                if (mouseX >= 800 && mouseX <= 840 && mouseY >= 500 && mouseY <= 540)
+                {
+                    // Handle text input for the input field
+                    amplitudeInputActive = false;
+                }
+                else if (mouseX >= 850 && mouseX <= 890 && mouseY >= 500 && mouseY <= 540)
+                {
+
+                    // Handle text input for the input field
+                    amplitudeInputActive = true;
+                }
+
+                if (mouseX >= 10 && mouseX <= 30 && mouseY >= 10 && mouseY <= 30)
+                {
+                    selectedSignal = ANALOG;
+                }
+                else if (mouseX >= 10 && mouseX <= 30 && mouseY >= 40 && mouseY <= 60)
+                {
+                    selectedSignal = DIGITAL;
+                }
                 // Check if the mouse click is inside the button
                 if (mouseX >= buttonRect.x && mouseX <= buttonRect.x + BUTTON_WIDTH &&
                     mouseY >= buttonRect.y && mouseY <= buttonRect.y + BUTTON_HEIGHT)
@@ -312,14 +229,21 @@ int main(int argc, char *args[])
                 else if (isMenuVisible)
                 {
                     // Handle menu item click
-                    for (int i = 0; i < numMenuItems; i++)
+                    for (int i = 0; i < (selectedSignal ? numMenuItems : numMenuItemsAnalog); i++)
                     {
                         if (mouseX >= 800 && mouseX <= 800 + MENU_WIDTH &&
                             mouseY >= 40 + i * MENU_HEIGHT && mouseY <= 40 + i * MENU_HEIGHT + MENU_HEIGHT)
                         {
                             std::cout << "Menu item clicked: " << menuItems[i] << std::endl;
-                            def = i;
-                            selectedMenuItem = menuItems[i];
+                            if (selectedSignal == 1)
+                            {
+                                def_d = i;
+                            }
+                            else
+                            {
+                                def_a = i;
+                            }
+                            selectedMenuItem = selectedSignal ? menuItems[i] : menuItemsAnalog[i];
                             isMenuVisible = false;
                         }
                     }
@@ -336,60 +260,89 @@ int main(int argc, char *args[])
         SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
         SDL_RenderClear(gRenderer);
 
-        // Draw the centered Cartesian plane grid
-        drawGrid();
+        selectedMenuItem = selectedSignal ? menuItems[def_d] : menuItemsAnalog[def_a];
 
-        // Select encoding techniques
-        // Nrz_i(arr, n, gRenderer, scale);
-        // manchaster(arr, n, gRenderer, scale);
-        // d_manchester(arr, n, gRenderer, scale);
-        // AMI(arr, n, gRenderer, scale);
-        // input_hdb3(arr, n);
-
-        // scramble(arr, n, gRenderer, scale);
-        switch (def)
+        render_radio_buttons(gRenderer);
+        if (selectedSignal == ANALOG)
         {
-        case 0:
-            Nrz_l(arr, n, gRenderer, scale);
 
-            break;
-        case 1:
-            Nrz_i(arr, n, gRenderer, scale);
-            break;
-        case 2:
-            manchaster(arr, n, gRenderer, scale);
-            break;
-        case 3:
-            d_manchester(arr, n, gRenderer, scale);
-            break;
-        case 4:
-            AMI(arr, n, gRenderer, scale);
-            break;
-        case 5:
-            input_hdb3(arr, n);
-            scramble(arr, n, gRenderer, scale);
-            break;
-        case 6:
-            input_b8zs(arr, n);
-            scramble(arr, n, gRenderer, scale);
-            break;
-        default:
-            std::cout << "Invalid Input" << std::endl;
-            break;
+            draw_grid_analog();
+            renderMenu_analog();
+            renderComboBox_analog();
+            renderForm_amplitude();
+            renderForm_frequency();
+            int frequency_ = stoi(userFreqInput);
+            int amplitude_ = stoi(userAmpInput);
+            Uint8 red[4] = {0, 0, 255, 255};
+            Uint8 green[4] = {1, 100, 32, 255};
+            Uint8 blue[4] = {255, 0, 0, 255};
+
+            switch (def_a)
+            {
+            case 0:
+                draw_continuous_wave(gRenderer, sine_wave, frequency_, amplitude_, red);
+                break;
+            case 1:
+                draw_continuous_wave(gRenderer, cosine_wave, frequency_, amplitude_, green);
+                break;
+            case 2:
+                draw_continuous_wave(gRenderer, triangle_wave, frequency_, amplitude_, blue);
+                break;
+            default:
+                std::cout << "Invalid Input" << std::endl;
+                break;
+            }
         }
+        else
+        {
+            draw_grid_digital();
+            renderMenu_digital();
+            renderComboBox_digital();
+            renderForm();
+            switch (def_d)
+            {
+            case 0:
+                Nrz_l(arr, n, gRenderer, scale);
+
+                break;
+            case 1:
+                Nrz_i(arr, n, gRenderer, scale);
+                break;
+            case 2:
+                manchaster(arr, n, gRenderer, scale);
+                break;
+            case 3:
+                d_manchester(arr, n, gRenderer, scale);
+                break;
+            case 4:
+                AMI(arr, n, gRenderer, scale);
+                break;
+            case 5:
+                input_hdb3(arr, n);
+                scramble(arr, n, gRenderer, scale);
+                break;
+            case 6:
+                input_b8zs(arr, n);
+                scramble(arr, n, gRenderer, scale);
+                break;
+            default:
+                std::cout << "Invalid Input" << std::endl;
+                break;
+            }
+        }
+
+        // userInput = input_a2d;
 
         if (n >= float(800 / scale))
         {
             scale = scale / 2;
         }
-        if (n == float(800 / (scale*2)))
+        if (n == float(800 / (scale * 2)))
         {
-            scale = scale * 2 ;
+            scale = scale * 2;
         }
 
-        renderMenu();
-        renderComboBox();
-        renderForm();
+        // renderForm();
 
         SDL_RenderPresent(gRenderer);
     }

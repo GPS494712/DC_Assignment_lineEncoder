@@ -55,11 +55,6 @@ void input_hdb3(int *arr, int size)
             count1 = 0;
         }
     }
-    // 10011010
-    for (int i = 0; i < size; i++)
-    {
-        std::cout << arr[i] << " ";
-    }
 }
 
 // this input_hdb3 is not perfect, correct it below and don't copy my above code.
