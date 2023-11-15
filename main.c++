@@ -4,7 +4,6 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "functions.c++"
-// #include "func_analog.c++"
 #include "input_reform.c++"
 #include "visuals.c++"
 
@@ -45,7 +44,7 @@ void render_radio_button(SDL_Renderer *renderer, const char *text, int x, int y,
     SDL_DestroyTexture(texture);
 }
 
-// In your main loop, call this function to render the radio buttons
+// In the main loop, call this function to render the radio buttons
 void render_radio_buttons(SDL_Renderer *renderer)
 {
     // Assuming TTF font is initialized and available globally
@@ -57,7 +56,7 @@ void render_radio_buttons(SDL_Renderer *renderer)
     render_radio_button(renderer, "Digital", 10, 40, selectedSignal == DIGITAL);
 }
 
-// In your main loop, handle mouse click events to update the selected signal
+// In the main loop, handle mouse click events to update the selected signal
 void handle_mouse_click(SDL_Event &event)
 {
     int mouseX, mouseY;
@@ -331,7 +330,6 @@ int main(int argc, char *args[])
             }
         }
 
-        // userInput = input_a2d;
 
         if (n >= float(800 / scale))
         {
@@ -342,7 +340,6 @@ int main(int argc, char *args[])
             scale = scale * 2;
         }
 
-        // renderForm();
 
         SDL_RenderPresent(gRenderer);
     }

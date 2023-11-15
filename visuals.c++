@@ -26,8 +26,6 @@ SDL_Rect ampRect = {850, 500, 40, 40};
 void renderMenu_digital()
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    // SDL_Rect menuRect = {800, 200, MENU_WIDTH, MENU_HEIGHT};
-    // SDL_RenderFillRect(gRenderer, &menuRect);
 
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     // SDL_RenderDrawRect(gRenderer, &menuRect);
@@ -312,12 +310,9 @@ void draw_grid_digital()
     // Set draw color for the grid lines
     SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
 
-    // Draw horizontal lines
-    // for (int i = 0; i <= SCREEN_HEIGHT; i += scale)
-    // {
-    //     SDL_RenderDrawLine(gRenderer, 0, i, 800, i);
+
     SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
-    // }
+
     // Draw vertical lines
     for (int i = 0; i <= 800; i += scale)
     {

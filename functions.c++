@@ -5,15 +5,10 @@
 void Nrz_l(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-    // SDL_RenderDrawLine(gRenderer, 0, 300, 800, 300);
     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
     int xx = 0, yy = 260;
     for (int i = 0; i < size - 1; i++)
     {
-        // SDL_RenderDrawLine(gRenderer, (i*2), 260, (i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, i*2, 260, (i*2+scale), 260);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 260, scale+(i*2), 300);
-        // SDL_RenderDrawLine(gRenderer, scale+(i*2), 300, scale+(i*2+scale), 300);
 
         if (test[i] == 0)
         {
@@ -249,7 +244,6 @@ void AMI(int *test, int size, SDL_Renderer *gRenderer, int scale)
     }
 }
 
-// the above scramble-Encoding-signal logic is incorrect implement the correct logic here
 void scramble(int *test, int size, SDL_Renderer *gRenderer, int scale)
 {
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);

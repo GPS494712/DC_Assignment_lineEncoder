@@ -57,4 +57,3 @@ void input_hdb3(int *arr, int size)
     }
 }
 
-// this input_hdb3 is not perfect, correct it below and don't copy my above code.
