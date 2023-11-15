@@ -125,12 +125,57 @@ void renderComboBox_analog()
     }
 }
 
+// void renderForm_frequency()
+// {
+//     // Render input field
+//     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+//     SDL_RenderDrawRect(gRenderer, &freqRect);
+//     SDL_RenderDrawLine(gRenderer, freqRect.x, freqRect.y + INPUT_HEIGHT, freqRect.x + INPUT_WIDTH, freqRect.y + INPUT_HEIGHT);
+
+//     SDL_Surface *textSurface = TTF_RenderText_Solid(font, userInput.c_str(), textColor);
+//     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+
+//     // Render text inside the input field
+//     for (size_t i = 0; i < userFreqInput.size(); ++i)
+//     {
+//         char c = userFreqInput[i];
+//         std::string charString(1, c);
+
+//         // Render each character individually
+//         SDL_Surface *charSurface = SDL_CreateRGBSurfaceWithFormat(0, 10, 20, 32, SDL_PIXELFORMAT_RGBA32);
+//         SDL_FillRect(charSurface, NULL, 0); // Fill with transparent color
+
+//         // Render text on the character surface
+//         textSurface = TTF_RenderText_Solid(font, charString.c_str(), textColor);
+//         SDL_Rect textRect = {0, 0, textSurface->w, textSurface->h};
+//         SDL_BlitSurface(textSurface, NULL, charSurface, &textRect);
+
+//         SDL_Texture *charTexture = SDL_CreateTextureFromSurface(gRenderer, charSurface);
+
+//         SDL_Rect charRect = {freqRect.x + 10 + i * 10, freqRect.y + 5, 10, 20};
+//         SDL_RenderCopy(gRenderer, charTexture, NULL, &charRect);
+
+//         SDL_FreeSurface(charSurface);
+//         SDL_FreeSurface(textSurface);
+//         SDL_DestroyTexture(charTexture);
+//     }
+// }
+
+// input box for frequency.
 void renderForm_frequency()
 {
     // Render input field
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderDrawRect(gRenderer, &freqRect);
-    SDL_RenderDrawLine(gRenderer, freqRect.x, freqRect.y + INPUT_HEIGHT, freqRect.x + INPUT_WIDTH, freqRect.y + INPUT_HEIGHT);
+    // SDL_RenderDrawLine(gRenderer, freqRect.x, freqRect.y + INPUT_HEIGHT, freqRect.x + INPUT_WIDTH, freqRect.y + INPUT_HEIGHT);
+
+    // Render label for frequency
+    SDL_Surface *freqLabelSurface = TTF_RenderText_Solid(font, "Freq", textColor);
+    SDL_Texture *freqLabelTexture = SDL_CreateTextureFromSurface(gRenderer, freqLabelSurface);
+    SDL_Rect freqLabelRect = {freqRect.x, freqRect.y - 30, freqLabelSurface->w, freqLabelSurface->h};
+    SDL_RenderCopy(gRenderer, freqLabelTexture, nullptr, &freqLabelRect);
+    SDL_FreeSurface(freqLabelSurface);
+    SDL_DestroyTexture(freqLabelTexture);
 
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, userInput.c_str(), textColor);
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
@@ -161,14 +206,59 @@ void renderForm_frequency()
     }
 }
 
-// input box for frequency.
+
+// void renderForm_amplitude()
+// {
+//     // Render input field
+//     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+//     SDL_RenderDrawRect(gRenderer, &ampRect);
+//     SDL_RenderDrawLine(gRenderer, ampRect.x, ampRect.y + INPUT_HEIGHT, ampRect.x + INPUT_WIDTH, ampRect.y + INPUT_HEIGHT);
+
+//     SDL_Surface *textSurface = TTF_RenderText_Solid(font, userInput.c_str(), textColor);
+//     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+
+//     // Render text inside the input field
+//     for (size_t i = 0; i < userAmpInput.size(); ++i)
+//     {
+//         char c = userAmpInput[i];
+//         std::string charString(1, c);
+
+//         // Render each character individually
+//         SDL_Surface *charSurface = SDL_CreateRGBSurfaceWithFormat(0, 10, 20, 32, SDL_PIXELFORMAT_RGBA32);
+//         SDL_FillRect(charSurface, NULL, 0); // Fill with transparent color
+
+//         // Render text on the character surface
+//         textSurface = TTF_RenderText_Solid(font, charString.c_str(), textColor);
+//         SDL_Rect textRect = {0, 0, textSurface->w, textSurface->h};
+//         SDL_BlitSurface(textSurface, NULL, charSurface, &textRect);
+
+//         SDL_Texture *charTexture = SDL_CreateTextureFromSurface(gRenderer, charSurface);
+
+//         SDL_Rect charRect = {ampRect.x + 10 + i * 10, ampRect.y + 5, 10, 20};
+//         SDL_RenderCopy(gRenderer, charTexture, NULL, &charRect);
+
+//         SDL_FreeSurface(charSurface);
+//         SDL_FreeSurface(textSurface);
+//         SDL_DestroyTexture(charTexture);
+//     }
+// }
+
+// input box for amplitude.
 
 void renderForm_amplitude()
 {
     // Render input field
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderDrawRect(gRenderer, &ampRect);
-    SDL_RenderDrawLine(gRenderer, ampRect.x, ampRect.y + INPUT_HEIGHT, ampRect.x + INPUT_WIDTH, ampRect.y + INPUT_HEIGHT);
+    // SDL_RenderDrawLine(gRenderer, ampRect.x, ampRect.y + INPUT_HEIGHT, ampRect.x + INPUT_WIDTH, ampRect.y + INPUT_HEIGHT);
+
+    // Render label for amplitude in red
+    SDL_Surface *ampLabelSurface = TTF_RenderText_Solid(font, "Amp", {255, 0, 0, 255});
+    SDL_Texture *ampLabelTexture = SDL_CreateTextureFromSurface(gRenderer, ampLabelSurface);
+    SDL_Rect ampLabelRect = {ampRect.x, ampRect.y - 30, ampLabelSurface->w, ampLabelSurface->h};
+    SDL_RenderCopy(gRenderer, ampLabelTexture, nullptr, &ampLabelRect);
+    SDL_FreeSurface(ampLabelSurface);
+    SDL_DestroyTexture(ampLabelTexture);
 
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, userInput.c_str(), textColor);
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
@@ -199,7 +289,6 @@ void renderForm_amplitude()
     }
 }
 
-// input box for amplitude.
 
 void renderForm()
 {
