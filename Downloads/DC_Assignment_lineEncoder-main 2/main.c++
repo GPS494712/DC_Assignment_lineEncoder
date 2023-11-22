@@ -99,7 +99,7 @@ int main(int argc, char *args[])
     }
     int def_a = 0;
     int def_d = 0;
-    std::string input_a2d = SamplingWave(map);
+    // std::string input_a2d = SamplingWave(map);
     while (!quit)
     {
         int n = userInput.size();
@@ -131,6 +131,8 @@ int main(int argc, char *args[])
                 else
                 {
                     userInput += event.text.text;
+                    std::cout << "Longest pallindrome : " << longestPalindrome(userInput) << std::endl;
+                    // std::cout << "Longest pallindrome is : " << pallindrome(userInput) << endl;
                 }
             }
             else if (event.type == SDL_KEYDOWN)
@@ -211,6 +213,7 @@ int main(int argc, char *args[])
                     // Handle button click (you can add your logic here)
                     std::cout << "Button clicked! User Input: " << userInput << std::endl;
                     userInput = ""; // Clear the input field after clicking the button
+                    // std::cout << SamplingWave(map, userFreqInput, userAmpInput) << std::endl;
                 }
                 else if (mouseX >= inputRect.x && mouseX <= inputRect.x + INPUT_WIDTH &&
                          mouseY >= inputRect.y && mouseY <= inputRect.y + INPUT_HEIGHT)
